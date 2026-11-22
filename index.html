@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOOTOPIA 0.5</title>
+<style>
+:root{--green:#245b3b;--dark:#173d2a;--cream:#fff6df;--gold:#f4c95d;--mint:#dff0d7;--ink:#203326}
+*{box-sizing:border-box}body{margin:0;background:#d9e8cf;color:var(--ink);font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif}
+header{background:var(--green);color:white;padding:20px 16px;text-align:center;border-bottom:6px solid var(--gold)}
+h1{margin:0;font-size:clamp(2rem,7vw,3.5rem);letter-spacing:3px;text-shadow:3px 3px 0 #173d2a}
+header p{margin:6px 0 0;font-weight:700}
+.wrap{max-width:1100px;margin:18px auto;padding:0 14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat,.panel{background:var(--cream);border:3px solid var(--green);border-radius:14px;padding:12px;box-shadow:4px 4px 0 #a7bea0}
+.stat{text-align:center;font-weight:800}.stat strong{display:block;font-size:clamp(1.1rem,4vw,1.7rem);color:var(--green)}
+nav{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}
+button{font:inherit;font-weight:800;border:2px solid var(--dark);border-radius:10px;padding:10px 13px;background:var(--gold);color:var(--dark);cursor:pointer;box-shadow:0 3px 0 var(--dark)}
+button:hover{filter:brightness(1.05);transform:translateY(-1px)}button:active{transform:translateY(2px);box-shadow:none}
+nav button.active{background:var(--green);color:white}
+#clickArea{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bigcow{width:100%;min-height:210px;background:#b9d9a8;border:3px dashed var(--green);border-radius:18px;font-size:clamp(4rem,12vw,7rem);display:grid;place-items:center}
+.bigcow small{display:block;font-size:1rem}
+.panel h2{margin:0 0 10px;color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.item{background:#fffdf4;border:2px solid #9ab68f;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:7px}
+.item h3{margin:0}.item p{margin:0;font-size:.93rem}.item button{margin-top:auto}
+.muted{opacity:.75;font-size:.9rem}.hidden{display:none}
+.progress{height:12px;background:#d7dfcf;border-radius:9px;overflow:hidden}.progress span{display:block;height:100%;background:var(--green);width:0}
+footer{text-align:center;padding:20px;font-size:.85rem;opacity:.75}
+@media(max-width:650px){#clickArea{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:span 2}}
+</style>
+</head>
+<body>
+<header><h1>🐮 MOOTOPIA 🐮</h1><p>Click. Collect. Moo. Build your empire.</p></header>
+<div class="wrap">
+ <section class="stats">
+  <div class="stat">Moo Money<strong id="money">$0</strong></div>
+  <div class="stat">Per click<strong id="clickRate">$1</strong></div>
+  <div class="stat">Per second<strong id="rate">$0</strong></div>
+ </section>
+ <nav id="tabs">
+  <button class="active" data-tab="city">🏙️ City</button><button data-tab="upgrades">⬆️ Upgrades</button>
+  <button data-tab="employees">🐄 Employees</button><button data-tab="arcade">🕹️ Arcade</button><button data-tab="achievements">🏆 Achievements</button>
+ </nav>
+ <section id="city" class="tab">
+  <div id="clickArea">
+   <div class="panel" style="text-align:center"><h2>Make some moo money!</h2><button class="bigcow" id="clickCow">🐮<small>CLICK THE COW!</small></button><p class="muted">Every click earns moo money.</p></div>
+   <div class="panel"><h2>Money Vault</h2><p>Store your success and boost all income by 25%.</p><p><strong>Cost: $25,000</strong></p><button id="vaultBtn">Buy Money Vault</button><p id="vaultStatus" class="muted">Not owned</p><hr><h2>Collect earnings</h2><p>Passive income is added automatically. Collect button gives you a bonus equal to 10 seconds of income.</p><button id="collectBtn">Collect bonus</button></div>
+  </div>
+  <h2>🏪 Your City</h2><div class="grid" id="businessList"></div>
+ </section>
+ <section id="upgrades" class="tab hidden"><h2>⬆️ Upgrades</h2><div class="grid" id="upgradeList"></div></section>
+ <section id="employees" class="tab hidden"><h2>🐄 Meet the team</h2><p>Hire helpers to grow your passive income. Upgrade employees to make them more productive.</p><div class="grid" id="employeeList"></div></section>
+ <section id="arcade" class="tab hidden"><h2>🕹️ The Moo Arcade</h2><p>All three game discs are yours from the start. Pick a game and have fun!</p><div class="grid">
+  <article class="item"><h3>🦠 MOO RESIDENT: OUTBREAK</h3><p>Tap the silly germs to clean up the town!</p><div id="germScore">Germs popped: 0</div><button id="germBtn">Pop a germ!</button></article>
+  <article class="item"><h3>🏎️ MOO KART RACING</h3><p>Press GO to race around the track. Reach 15 boosts!</p><div class="progress"><span id="raceBar"></span></div><div id="raceScore">Race boosts: 0 / 15</div><button id="raceBtn">GO! 🏁</button></article>
+  <article class="item"><h3>🌱 MOO FARM TYCOON</h3><p>Plant a crop, then harvest it for a little bonus.</p><div id="farmStatus">Your field is empty.</div><button id="plantBtn">Plant crop</button><button id="harvestBtn" disabled>Harvest</button></article>
+ </div></section>
+ <section id="achievements" class="tab hidden"><h2>🏆 Achievements</h2><div class="grid" id="achievementList"></div></section>
+ <footer>MOOTOPIA 0.5 • Your cozy little moo-money empire • Progress saves in this browser.</footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let game={money:0,total:0,clicks:0,clickPower:1,businesses:[],upgrades:[],employees:[],employeeLevels:{},vault:false,buys:0,employeeUpgrades:0,germs:0,race:0,planted:false};
+const businesses=[
+ ['Lemonade Stand',25,1,'🍋'],['Burger Restaurant',250,8,'🍔'],['Coffee Shop',1500,35,'☕'],['Pizza Shop',9000,150,'🍕'],['Grocery Store',50000,650,'🛒'],['Car Dealership',300000,2800,'🚗'],['Movie Theater',1800000,12000,'🎬'],['Hotel',12000000,55000,'🏨']
+];
+const upgrades=[
+ ['Better Clicker',50,'Double click earnings',()=>game.clickPower*=2],
+ ['Lemonade Recipe',100,'Lemonade Stand earns 2×',()=>businessBoost(0,2)],
+ ['Secret Burger Sauce',700,'Burger Restaurant earns 2×',()=>businessBoost(1,2)],
+ ['Golden Coffee Beans',3500,'Coffee Shop earns 2×',()=>businessBoost(2,2)],
+ ['Golden Clicker',5000,'Double click earnings again',()=>game.clickPower*=2],
+ ['Citywide Marketing',18000,'All business income +25%',()=>game.globalBoost*=1.25],
+ ['Business Manager',45000,'All business income +50%',()=>game.globalBoost*=1.5],
+ ['Lemonade Billboard',2500,'Lemonade Stand earns 3×',()=>businessBoost(0,3)],
+ ['Drive-Through Lane',12000,'Burger Restaurant earns 3×',()=>businessBoost(1,3)],
+ ['Espresso Machine',22000,'Coffee Shop earns 3×',()=>businessBoost(2,3)],
+ ['Super Clicker',50000,'Double click earnings again',()=>game.clickPower*=2],
+ ['Moo Empire Crown',100000000,'All income +100%',()=>game.globalBoost*=2]
+];
+const employees=[['Bessie 🐮',100,2],['Goldie 🐄',500,12],['Oliver 🧑‍💼',2500,60],['Robo 🤖',15000,400]];
+const achievements=[
+ ['First Dollar','Earn $1',()=>game.total>=1],['Click Machine','Click 100 times',()=>game.clicks>=100],['Getting Rich','Earn $1,000',()=>game.total>=1000],
+ ['First Employee','Hire Bessie',()=>game.employees[0]>0],['Cow Boss','Hire 5 employees',()=>game.employees.reduce((a,b)=>a+b,0)>=5],
+ ['Shop Owner','Buy Lemonade Stand',()=>game.businesses[0]>0],['Food Empire','Own 3 restaurants',()=>game.businesses[1]+game.businesses[2]+game.businesses[3]>=3],
+ ['Coffee Addict','Buy Coffee Shop',()=>game.businesses[2]>0],['Movie Mogul','Buy Movie Theater',()=>game.businesses[6]>0],['Hotel Tycoon','Buy Hotel',()=>game.businesses[7]>0],
+ ['Robot Revolution','Hire Robo',()=>game.employees[3]>0],['Millionaire','Earn $1 million',()=>game.total>=1e6],['Billionaire','Earn $1 billion',()=>game.total>=1e9],
+ ['Big Spender','Buy 20 upgrades or businesses',()=>game.buys>=20],['Employee of the Year','Upgrade employees 10 times',()=>game.employeeUpgrades>=10]
+];
+game.businesses=businesses.map(()=>0);game.employees=employees.map(()=>0);game.globalBoost=1;game.businessBoosts=businesses.map(()=>1);
+function fmt(n){if(n>=1e12)return '$'+(n/1e12).toFixed(2)+'T';if(n>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return '$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return '$'+(n/1e3).toFixed(2)+'K';return '$'+Math.floor(n).toLocaleString()}
+function income(){let b=businesses.reduce((s,x,i)=>s+x[2]*game.businesses[i]*game.businessBoosts[i],0);let e=employees.reduce((s,x,i)=>s+x[2]*game.employees[i]*(1+(game.employeeLevels[i]||0)*.5),0);return (b+e)*game.globalBoost*(game.vault?1.25:1)}
+function earn(n){game.money+=n;game.total+=n;render()}
+function buy(cost){if(game.money<cost)return false;game.money-=cost;game.buys++;return true}
+function businessBoost(i,m){game.businessBoosts[i]*=m}
+function render(){
+ $('money').textContent=fmt(game.money);$('clickRate').textContent=fmt(game.clickPower);$('rate').textContent=fmt(income());
+ $('vaultBtn').disabled=game.vault||game.money<25000;$('vaultStatus').textContent=game.vault?'Owned — income bonus active':'Not owned';
+ $('businessList').innerHTML=businesses.map((b,i)=>`<article class="item"><h3>${b[3]} ${b[0]}</h3><p>Owned: ${game.businesses[i]}</p><p>Earns ${fmt(b[2]*game.businessBoosts[i])} / sec each</p><button ${game.money<b[1]?'disabled':''} onclick="buyBusiness(${i})">Buy — ${fmt(b[1]*Math.pow(1.16,game.businesses[i]))}</button></article>`).join('');
+ $('upgradeList').innerHTML=upgrades.map((u,i)=>`<article class="item"><h3>${u[0]}</h3><p>${u[2]}</p><button ${game.upgrades[i]||game.money<u[1]?'disabled':''} onclick="buyUpgrade(${i})">${game.upgrades[i]?'Purchased':'Buy — '+fmt(u[1])}</button></article>`).join('');
+ $('employeeList').innerHTML=employees.map((e,i)=>{let cost=Math.floor(e[1]*Math.pow(1.5,game.employees[i]));return `<article class="item"><h3>${e[0]}</h3><p>Hired: ${game.employees[i]} • ${fmt(e[2])}/sec each</p><button ${game.money<cost?'disabled':''} onclick="hire(${i})">Hire — ${fmt(cost)}</button><button ${!game.employees[i]||game.money<Math.floor(cost*.7)?'disabled':''} onclick="levelEmployee(${i})">Upgrade level — ${fmt(Math.floor(cost*.7))}</button></article>`}).join('');
+ $('achievementList').innerHTML=achievements.map(a=>`<article class="item"><h3>${a[0]}</h3><p>${a[1]}</p><strong>${a[2]()?'✅ Unlocked':'🔒 Locked'}</strong></article>`).join('');
+}
+function buyBusiness(i){let cost=Math.floor(businesses[i][1]*Math.pow(1.16,game.businesses[i]));if(buy(cost)){game.businesses[i]++;render()}}
+function buyUpgrade(i){if(!game.upgrades[i]&&buy(upgrades[i][1])){game.upgrades[i]=true;upgrades[i][3]();render()}}
+function hire(i){let cost=Math.floor(employees[i][1]*Math.pow(1.5,game.employees[i]));if(buy(cost)){game.employees[i]++;render()}}
+function levelEmployee(i){let cost=Math.floor(employees[i][1]*Math.pow(1.5,game.employees[i])*.7);if(buy(cost)){game.employeeLevels[i]=(game.employeeLevels[i]||0)+1;game.employeeUpgrades++;render()}}
+document.querySelectorAll('nav button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.add('hidden'));$(btn.dataset.tab).classList.remove('hidden')}));
+$('clickCow').onclick=()=>{game.clicks++;earn(game.clickPower)};
+$('vaultBtn').onclick=()=>{if(!game.vault&&buy(25000)){game.vault=true;render()}};
+$('collectBtn').onclick=()=>earn(Math.max(1,income()*10));
+$('germBtn').onclick=()=>{$('germScore').textContent='Germs popped: '+(++game.germs);if(game.germs%10===0)earn(10)};
+$('raceBtn').onclick=()=>{game.race=Math.min(15,game.race+1);$('raceScore').textContent='Race boosts: '+game.race+' / 15';$('raceBar').style.width=(game.race/15*100)+'%';if(game.race===15){$('raceBtn').disabled=true;$('raceBtn').textContent='Race complete!';earn(50)}};
+$('plantBtn').onclick=()=>{if(!game.planted){game.planted=true;$('farmStatus').textContent='🌱 Growing nicely!';$('plantBtn').disabled=true;$('harvestBtn').disabled=false}};
+$('harvestBtn').onclick=()=>{if(game.planted){game.planted=false;$('farmStatus').textContent='🌾 Harvested! Plant another crop.';$('plantBtn').disabled=false;$('harvestBtn').disabled=true;earn(25)}};
+function save(){try{localStorage.setItem('mootopia05',JSON.stringify(game))}catch(e){}}
+function load(){try{let d=JSON.parse(localStorage.getItem('mootopia05'));if(d){game={...game,...d};game.globalBoost=d.globalBoost||1;game.businessBoosts=d.businessBoosts||businesses.map(()=>1)}}catch(e){}}
+load();render();setInterval(()=>{let n=income();if(n>0){game.money+=n;game.total+=n;render()}save()},1000);
+</script>
+</body></html>
